@@ -34,18 +34,18 @@ install_prepare_port(){
             for num in $keys; do
                 if [ "$num" -eq "$shadowsocksport" ]; then
                     echo
-                    echo "port = ${shadowsocksport}"
+                    echo "Port was used: ${shadowsocksport} "
                     found=true
                     echo
                     # break
                 fi
             done
-            echo "Port was used: ${shadowsocksport} "
         fi
     fi
 
     # Выход из цикла проверки портов
     if [ $found = false ]; then
+        echo "port = ${shadowsocksport}"
         break
     fi
     echo -e "[${red}Error${plain}] Please enter a correct number [1-65535]"
@@ -74,4 +74,4 @@ echo "$updated_json" > "/etc/shadowsocks-python/config.json"
 keys=$(jq -r '.port_password | keys[]' /etc/shadowsocks-python/config.json)
 
 # Вывод всех ключей
-echo "$keys"
+echo "List used keys: $keys"
