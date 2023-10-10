@@ -20,31 +20,36 @@ install_prepare_password(){
 install_prepare_port(){
     while true
     do
+    found=false
     dport=$(shuf -i 9000-19999 -n 1)
     keys=$(jq -r '.port_password | keys[]' /etc/shadowsocks-python/config.json)
 
-    echo -e "Please enter a port for ${software[${selected}-1]} [1-65535]"
+    echo -e "Please enter a port for [1-65535]"
     read -p "(Default port: ${dport}):" shadowsocksport
     [ -z "${shadowsocksport}" ] && shadowsocksport=${dport}
     expr "${shadowsocksport}" + 1 &>/dev/null
 
-    found=false
-    for num in "${numbers[@]}"; do
-    if [ "$num" -eq "$target_number" ]; then
-        found=true
-        break
-    fi
-
-
     if [ $? -eq 0 ]; then
         if [ "${shadowsocksport}" -ge 1 ] && [ "${shadowsocksport}" -le 65535 ] && [ "${shadowsocksport:0:1}" != 0 ]; then
-            echo
-            echo "port = ${shadowsocksport}"
-            echo
-            break
+            for num in $keys; do
+                if [ "$num" -eq "$shadowsocksport" ]; then
+                    echo
+                    echo "port = ${shadowsocksport}"
+                    found=true
+                    echo
+                    # break
+                fi
+            done
+            echo "Port was used: ${shadowsocksport} "
         fi
     fi
+
+    # Выход из цикла проверки портов
+    if [ $found = false ]; then
+        break
+    fi
     echo -e "[${red}Error${plain}] Please enter a correct number [1-65535]"
+
     done
 }
 install_prepare_port
